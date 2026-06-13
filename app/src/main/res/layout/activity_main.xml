@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gist 연동"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/et_token"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="GitHub PAT 토큰"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/et_gist_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Gist ID" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="감시 설정"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/et_trigger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="트리거 키워드 (기본: 체결)" />
+
+        <Switch
+            android:id="@+id/sw_kakao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="카카오톡 알림도 감시" />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="설정 저장" />
+
+        <Button
+            android:id="@+id/btn_permission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="알림 접근 권한 설정" />
+
+        <Button
+            android:id="@+id/btn_refresh_rules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="규칙 새로고침 (Gist)" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="테스트 파싱"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/et_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="알림 텍스트를 붙여넣고 테스트"
+            android:minLines="3"
+            android:gravity="top" />
+
+        <Button
+            android:id="@+id/btn_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="파싱 테스트 (Gist 전송 안 함)" />
+
+        <Button
+            android:id="@+id/btn_test_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="파싱 + 실제 전송 테스트" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="로그"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_show_raw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="수집된 알림 원본 보기 (최근 50)" />
+
+        <TextView
+            android:id="@+id/tv_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="12sp"
+            android:typeface="monospace"
+            android:textIsSelectable="true" />
+
+    </LinearLayout>
+</ScrollView>

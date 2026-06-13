@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "trigger": "체결",
+  "excludePackages": ["com.kakao.talk"],
+  "rules": [
+    {
+      "name": "메리츠앱",
+      "requires": "[메리츠]",
+      "fields": {
+        "계좌명": "\\[메리츠\\](.+?)님",
+        "체결일자": "님 (\\d{2}/\\d{2}) ",
+        "종목명": "\\d{2}:\\d{2} (.+?) \\d+ USD",
+        "체결수량": " (\\d+) USD [\\d,.]+에",
+        "체결단가": "USD ([\\d,.]+)에",
+        "매매구분": "(매수|매도)체결"
+      }
+    },
+    {
+      "name": "카카오_메리츠",
+      "requires": "주문체결 안내",
+      "fields": {
+        "계좌명": "계좌명 : (.+)",
+        "계좌번호": "계좌번호 : (.+)",
+        "종목명": "종목명 : (.+)",
+        "매매구분": "매매구분 : (매수|매도)",
+        "체결단가": "체결단가 : USD ([\\d,.]+)",
+        "주문수량": "주문수량 : (\\d+)주",
+        "체결수량": "체결수량 : (\\d+)주",
+        "체결금액": "체결금액 : USD ([\\d,.]+)",
+        "체결일자": "체결일자 : ([\\d/]+)"
+      }
+    }
+  ],
+  "tickerMap": {
+    "DIREXION SEMICONDUCTOR DAILY 3X": "SOXL",
+    "PROSHARES QQQ 3X": "TQQQ",
+    "DIREXION DAILY TECHNOLOGY BULL 3X": "TECL",
+    "S&P BIOTECH BULL 3X": "LABU"
+  }
+}
