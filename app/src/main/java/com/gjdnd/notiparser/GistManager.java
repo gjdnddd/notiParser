@@ -34,16 +34,23 @@ public class GistManager {
     private static final String RULES_FILE = "noti_rules.json";
     private static final ExecutorService exec = Executors.newSingleThreadExecutor();
 
-    /** 거래를 로컬 큐에 넣고 즉시 전송 시도. 실패해도 큐에 남아 다음 기회에 재전송. */
+    /**
+     * 거래를 로컬 큐에 넣고 즉시 전송 시도.
+     * 큐 추가도 flushQueue와 같은 단일 스레드 executor에서 실행한다 — 그래야 알림이 근접해서
+     * 도착했을 때(예: 여러 종목이 비슷한 시각에 체결) 한쪽 처리 중 다른 쪽이 큐에 추가되고
+     * 그 추가분이 flushQueue 끝의 "큐 비우기"에 덮어써져 유실되는 레이스가 발생하지 않는다.
+     */
     public static void enqueueAndSend(Context ctx, JSONObject trade) {
-        try {
-            SharedPreferences prefs = prefs(ctx);
-            JSONArray queue = new JSONArray(prefs.getString("send_queue", "[]"));
-            queue.put(trade);
-            prefs.edit().putString("send_queue", queue.toString()).apply();
-        } catch (Exception e) {
-            Log.e(TAG, "큐 저장 실패", e);
-        }
+        exec.execute(() -> {
+            try {
+                SharedPreferences prefs = prefs(ctx);
+                JSONArray queue = new JSONArray(prefs.getString("send_queue", "[]"));
+                queue.put(trade);
+                prefs.edit().putString("send_queue", queue.toString()).apply();
+            } catch (Exception e) {
+                Log.e(TAG, "큐 저장 실패", e);
+            }
+        });
         flushQueue(ctx);
     }
 
