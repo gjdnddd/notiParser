@@ -14,7 +14,24 @@ android {
         versionName "1.0"
     }
 
+    // 디버그 서명 키를 OS 기본 경로(~/.android/debug.keystore) 대신 프로젝트 안의
+    // 파일로 고정한다. 기본 경로는 컴퓨터마다 독립적으로 자동 생성되어 서로 달라서,
+    // PC/노트북처럼 여러 기기에서 빌드하면 매번 서명이 달라져 기존 설치 위 업데이트가
+    // "서명 불일치"로 실패하는 문제가 있었다. 이 파일은 OneDrive로 프로젝트와 함께
+    // 동기화되므로 어느 기기에서 빌드하든 항상 같은 키로 서명된다.
+    signingConfigs {
+        debug {
+            storeFile file("../debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
         }
