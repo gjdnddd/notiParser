@@ -81,11 +81,13 @@ public class GistManager {
                     }
                 }
 
-                // 2) 중복 제거 후 append (timestamp 기준)
+                // 2) 중복 제거 후 append (dedupKey 기준 — timestamp는 처리 시각이라 재전송마다
+                // 값이 달라져 중복 판별에 쓸 수 없다. dedupKey는 알림 내용 자체로 만들어지므로
+                // 같은 체결이 리스너 재연결 등으로 재파싱돼도 동일한 값이 나온다.)
                 int added = 0;
                 for (int i = 0; i < queue.length(); i++) {
                     JSONObject t = queue.getJSONObject(i);
-                    if (!containsTimestamp(existing, t.optString("timestamp"))) {
+                    if (!containsDedupKey(existing, t.optString("dedupKey"))) {
                         existing.put(t);
                         added++;
                     }
@@ -189,9 +191,11 @@ public class GistManager {
         return sb.toString();
     }
 
-    private static boolean containsTimestamp(JSONArray arr, String ts) {
+    private static boolean containsDedupKey(JSONArray arr, String key) {
+        if (key == null || key.isEmpty()) return false; // 식별키 없으면 중복으로 취급하지 않음(안전 쪽으로)
         for (int i = 0; i < arr.length(); i++) {
-            if (ts.equals(arr.optJSONObject(i) != null ? arr.optJSONObject(i).optString("timestamp") : "")) return true;
+            JSONObject o = arr.optJSONObject(i);
+            if (o != null && key.equals(o.optString("dedupKey", ""))) return true;
         }
         return false;
     }

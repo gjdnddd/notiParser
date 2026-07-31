@@ -27,7 +27,12 @@ public class AlarmParser {
     private static final String TAG = "NotiParser";
     static final String PREFS = "notiparser_prefs";
 
+    /** 수동 테스트(MainActivity) 등 postTime이 없는 호출용 — 현재 시각을 postTime으로 대신 사용 */
     public static void handle(Context ctx, String pkg, String text) {
+        handle(ctx, pkg, text, System.currentTimeMillis());
+    }
+
+    public static void handle(Context ctx, String pkg, String text, long postTime) {
         SharedPreferences prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         try {
             JSONObject rules = loadRules(ctx);
@@ -65,7 +70,7 @@ public class AlarmParser {
                     continue;
                 }
 
-                JSONObject trade = normalize(ctx, parsed, rules, rule.optString("name"));
+                JSONObject trade = normalize(ctx, parsed, rules, rule.optString("name"), postTime);
                 AppLog.add(ctx, "파싱 성공 [" + rule.optString("name") + "] " +
                         trade.optString("종목명") + " " + trade.optString("매매구분") + " " +
                         trade.optString("체결수량"));
@@ -103,7 +108,7 @@ public class AlarmParser {
                             .append(": 필수 필드 누락 → ").append(parsed.toString()).append('\n');
                     continue;
                 }
-                JSONObject trade = normalize(ctx, parsed, rules, rule.optString("name"));
+                JSONObject trade = normalize(ctx, parsed, rules, rule.optString("name"), System.currentTimeMillis());
                 return "✓ 규칙 [" + rule.optString("name") + "] 매칭\n\n" + trade.toString(2);
             }
             return sb.length() > 0 ? sb.toString() : "매칭되는 규칙 없음";
@@ -125,7 +130,7 @@ public class AlarmParser {
     }
 
     /** 파싱 결과를 mmNoti(meritz_trades.json) 호환 형식으로 정규화 */
-    private static JSONObject normalize(Context ctx, JSONObject parsed, JSONObject rules, String source) throws Exception {
+    private static JSONObject normalize(Context ctx, JSONObject parsed, JSONObject rules, String source, long postTime) throws Exception {
         JSONObject t = new JSONObject();
         long now = System.currentTimeMillis();
 
@@ -168,6 +173,15 @@ public class AlarmParser {
         t.put("체결일자", date);
         t.put("timestamp", String.valueOf(now));
         t.put("source", source);
+        // 알림 내용 + postTime(알림이 실제 게시된 시각) 기반 식별키.
+        // postTime을 넣는 이유: 내용만으로 만들면 같은 종목·가격·수량으로 여러 번
+        // 나눠 체결된 진짜 별개의 거래들이 서로 구분이 안 돼 오탐(정상 거래를 중복으로
+        // 오인해 버림) 문제가 있었다. postTime은 리스너 재연결로 같은 알림이 재전달돼도
+        // 원래 게시 시점 그대로 유지되고, 진짜 새 체결 알림은 매번 새 시각을 갖기 때문에
+        // 재전송(진짜 중복)과 반복 체결(진짜 별개 거래)을 구분하는 데 쓴다.
+        t.put("dedupKey", parsed.optString("계좌번호", "") + "|" + name + "|"
+                + parsed.optString("매매구분", "") + "|" + priceStr + "|" + qty + "|" + date
+                + "|" + postTime);
         return t;
     }
 

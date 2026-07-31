@@ -1,10 +1,12 @@
 package com.gjdnd.notiparser;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.service.notification.NotificationListenerService;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -63,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
         ((Button) findViewById(R.id.btn_test_send)).setOnClickListener(v -> runTest(true));
 
         ((Button) findViewById(R.id.btn_show_raw)).setOnClickListener(v -> showRawDialog());
+
+        // 앱 열 때마다 알림 리스너 재바인딩 요청 — 권한은 켜져 있는데 OS 바인딩만
+        // 죽어서 알림을 전혀 못 받는 상태(실제로 한 번 발생함)를 자동 복구한다.
+        // 바인딩이 멀쩡해도 재요청은 안전하다(no-op에 가까움).
+        NotificationListenerService.requestRebind(
+                new ComponentName(this, NotiListenerService.class));
+        AppLog.add(this, "알림 리스너 재바인딩 요청");
 
         // 앱 열 때마다 규칙 갱신 + 미전송 큐 재시도
         if (!prefs.getString("gist_token", "").isEmpty()) {

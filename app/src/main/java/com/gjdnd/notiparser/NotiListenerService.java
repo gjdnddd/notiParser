@@ -34,6 +34,9 @@ public class NotiListenerService extends NotificationListenerService {
         String text = (title != null ? title + "\n" : "") + body;
         if (text.trim().isEmpty()) return;
 
-        AlarmParser.handle(getApplicationContext(), pkg, text);
+        // postTime: 알림이 실제로 게시된 시각. 리스너 재연결로 같은 알림이 재전달돼도
+        // 이 값은 원래 게시 시점 그대로 유지되므로 dedupKey에 넣어 진짜 재전송과
+        // 같은 내용의 새로운 체결을 구분한다.
+        AlarmParser.handle(getApplicationContext(), pkg, text, sbn.getPostTime());
     }
 }
